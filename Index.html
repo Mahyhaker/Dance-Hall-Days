@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio de Projetos - Desenvolvedor Front-End</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2ecc71;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --text-light: #f4f4f4;
+            --text-muted: #a9a9a9;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', 'Arial', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+            z-index: 1;
+        }
+        header h1 {
+            position: relative;
+            z-index: 2;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        header p {
+            position: relative;
+            z-index: 2;
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2em;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+        .project-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        }
+        .project-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .project-title {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        .project-description {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .project-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+        .project-link:hover {
+            background: var(--primary-color);
+        }
+        .project-tech-tag {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--secondary-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            header {
+                padding: 50px 20px;
+            }
+            header h1 {
+                font-size: 2em;
+            }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .projects-grid .project-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+        .projects-grid .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .projects-grid .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .projects-grid .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .projects-grid .project-card:nth-child(4) { animation-delay: 0.4s; }
+        .projects-grid .project-card:nth-child(5) { animation-delay: 0.5s; }
+        .projects-grid .project-card:nth-child(6) { animation-delay: 0.6s; }
+        .projects-grid .project-card:nth-child(7) { animation-delay: 0.7s; }
+        .projects-grid .project-card:nth-child(8) { animation-delay: 0.8s; }
+        .projects-grid .project-card:nth-child(9) { animation-delay: 0.9s; }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <h1>Portfólio de Projetos</h1>
+        <p>Desenvolvedor Front-End | Soluções Criativas e Inovadoras</p>
+    </header>
+
+    <div class="container">
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Pedala</h3>
+                        <p class="project-description">Aplicação web completa para entusiastas de ciclismo, integrando comunidade e informações sobre rotas e eventos.</p>
+                        <span class="project-tech-tag">Web App</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Pedala-" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Don't Take Me Alive</h3>
+                        <p class="project-description">Sistema de gerenciamento de tarefas com interface intuitiva e funcionalidades avançadas de produtividade.</p>
+                        <span class="project-tech-tag">Task Manager</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Don-t-Take-Me-Alive" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Ozone Baby</h3>
+                        <p class="project-description">Plataforma de votação inovadora desenvolvida para hackathon 2024, com recursos de interação dinâmica.</p>
+                        <span class="project-tech-tag">Hackathon Project</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Ozone-baby-" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Doomsday</h3>
+                        <p class="project-description">Pokedex interativa com design moderno, oferecendo informações detalhadas sobre Pokémon.</p>
+                        <span class="project-tech-tag">Interactive App</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Doomsday" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Canned Heat</h3>
+                        <p class="project-description">Piano interativo com interface moderna, permitindo composição e experimentação musical.</p>
+                        <span class="project-tech-tag">Music App</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Canned-Heat" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Glamour Profession</h3>
+                        <p class="project-description">Jogo Yu-Gi-Oh Jo-Ken-Po com mecânicas únicas e design envolvente.</p>
+                        <span class="project-tech-tag">Game</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Glamour-Profession" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Sign In Stranger</h3>
+                        <p class="project-description">Jogo de memória desafiador com interface elegante e mecânicas de jogabilidade envolventes.</p>
+                        <span class="project-tech-tag">Memory Game</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Sign-In-Stranger" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">All Casps</h3>
+                        <p class="project-description">Landing page temática inspirada na estética de Lovecraft, com design atmosférico e envolvente.</p>
+                        <span class="project-tech-tag">Landing Page</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/All-Casps" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <div>
+                        <h3 class="project-title">Domino Line</h3>
+                        <p class="project-description">Projeto de Data Analysis e Machine Learning desenvolvido durante hackathon, com insights inovadores.</p>
+                        <span class="project-tech-tag">Data Science</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mahyhaker/Domino-Line" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i> Repositório
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
