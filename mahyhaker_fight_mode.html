@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mahyhaker Fight Mode</title>
+  <style>
+    :root{
+      --bg:#0a0008;
+      --bg2:#18001f;
+      --surface:#1b0326;
+      --accent:#ff2d78;
+      --accent2:#00e5ff;
+      --accent3:#ffe600;
+      --text:#f0e8ff;
+      --muted:#ad98bf;
+      --good:#00ff7b;
+      --bad:#ff4d4d;
+      --border:#4a1260;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:radial-gradient(circle at top, #1a0030 0%, var(--bg) 55%);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:20px;
+    }
+    .title{
+      text-align:center;
+      margin-bottom:18px;
+    }
+    .title h1{
+      margin:0 0 6px;
+      font-size:clamp(28px, 5vw, 48px);
+      letter-spacing:2px;
+      color:var(--accent3);
+      text-shadow:0 0 16px rgba(255,230,0,.35);
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .hud{
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      gap:14px;
+      align-items:center;
+      margin:14px 0 18px;
+    }
+    .barBox{
+      background:rgba(0,0,0,.45);
+      border:2px solid var(--border);
+      padding:10px;
+      border-radius:14px;
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+    }
+    .label{
+      font-weight:700;
+      margin-bottom:8px;
+      color:var(--accent2);
+    }
+    .bar{
+      height:22px;
+      background:#09020d;
+      border:2px solid #fff3;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      width:100%;
+      transition:width .12s linear;
+    }
+    #playerHealth{background:linear-gradient(90deg, var(--good), #89ff00);}
+    #enemyHealth{background:linear-gradient(90deg, var(--bad), #ff8a00);}
+    .centerHud{
+      min-width:140px;
+      text-align:center;
+      background:rgba(0,0,0,.45);
+      border:2px solid var(--accent3);
+      border-radius:14px;
+      padding:10px 14px;
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+    }
+    .centerHud .big{
+      font-size:28px;
+      font-weight:800;
+      color:var(--accent3);
+    }
+    .arena{
+      position:relative;
+      width:100%;
+      aspect-ratio:16/9;
+      min-height:430px;
+      overflow:hidden;
+      border:3px solid var(--accent);
+      border-radius:22px;
+      background:
+        linear-gradient(to top, rgba(255,45,120,.12), transparent 35%),
+        linear-gradient(to top, #311248 0%, #1a0730 42%, #0f0221 100%);
+      box-shadow:0 18px 44px rgba(0,0,0,.35);
+    }
+    .grid{
+      position:absolute;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(0,229,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,.08) 1px, transparent 1px);
+      background-size:40px 40px;
+      pointer-events:none;
+    }
+    .floor{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height:24%;
+      background:
+        linear-gradient(to top, rgba(0,0,0,.4), transparent 70%),
+        repeating-linear-gradient(90deg, rgba(255,230,0,.18) 0 16px, transparent 16px 32px),
+        linear-gradient(to top, #4f1240, #1c0723);
+      border-top:3px solid var(--accent3);
+    }
+    .fighter{
+      position:absolute;
+      bottom:20%;
+      width:90px;
+      height:150px;
+      transform-origin:50% 100%;
+      transition:transform .05s linear;
+    }
+    .fighter .shadow{
+      position:absolute;
+      left:8px;
+      bottom:-8px;
+      width:74px;
+      height:16px;
+      background:rgba(0,0,0,.34);
+      filter:blur(3px);
+      border-radius:50%;
+    }
+    .fighter .body{
+      position:absolute;
+      inset:0;
+      border-radius:16px 16px 10px 10px;
+      border:3px solid #ffffff25;
+      box-shadow:inset 0 0 0 2px #00000028, 0 8px 18px rgba(0,0,0,.25);
+    }
+    #player .body{
+      background:
+        radial-gradient(circle at 50% 22%, #fff3 0 11px, transparent 12px),
+        linear-gradient(to bottom, #00d4ff 0 24%, #2533ff 24% 62%, #0f0c1f 62% 100%);
+    }
+    #enemy .body{
+      background:
+        radial-gradient(circle at 50% 22%, #fff3 0 11px, transparent 12px),
+        linear-gradient(to bottom, #ff7a00 0 24%, #ff174f 24% 62%, #220914 62% 100%);
+    }
+    .fighter::before, .fighter::after{
+      content:"";
+      position:absolute;
+      background:#e6d2c5;
+      border-radius:12px;
+    }
+    .fighter::before{
+      width:18px;height:54px;left:-6px;top:48px;transform:rotate(8deg);
+    }
+    .fighter::after{
+      width:18px;height:54px;right:-6px;top:48px;transform:rotate(-8deg);
+    }
+    .fighter .legs::before, .fighter .legs::after{
+      content:"";
+      position:absolute;
+      width:20px;height:62px;bottom:-4px;background:#101019;border-radius:10px;
+    }
+    .fighter .legs::before{left:18px;}
+    .fighter .legs::after{right:18px;}
+    #enemy{transform:scaleX(-1);}
+    .nameTag{
+      position:absolute;
+      bottom:100%;
+      left:50%;
+      transform:translateX(-50%);
+      white-space:nowrap;
+      font-size:12px;
+      font-weight:700;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.5);
+      border:1px solid #ffffff24;
+      margin-bottom:10px;
+    }
+    .hitbox{
+      position:absolute;
+      width:64px;
+      height:54px;
+      top:44px;
+      right:-56px;
+      border:2px dashed rgba(255,230,0,.0);
+      border-radius:10px;
+      pointer-events:none;
+    }
+    .showHitbox .hitbox{border-color:rgba(255,230,0,.35);}
+    .jump{transform:translateY(-120px) !important;}
+    .punching .body{filter:brightness(1.18);}
+    .kicking .body{filter:saturate(1.2) brightness(1.12);}
+    .hurt .body{filter:brightness(1.3) saturate(.75);}
+    .message{
+      position:absolute;
+      left:50%;
+      top:14%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,.62);
+      border:2px solid var(--accent3);
+      color:var(--accent3);
+      padding:12px 18px;
+      border-radius:14px;
+      font-weight:800;
+      letter-spacing:1px;
+      box-shadow:0 12px 26px rgba(0,0,0,.3);
+      opacity:0;
+      transition:opacity .2s;
+    }
+    .message.show{opacity:1;}
+    .controls{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+      margin-top:18px;
+    }
+    .panel{
+      background:rgba(255,255,255,.04);
+      border:2px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+    }
+    .panel h3{
+      margin:0 0 10px;
+      color:var(--accent2);
+    }
+    .keys{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:8px;
+    }
+    .key{
+      padding:10px 12px;
+      border-radius:12px;
+      background:#0d0714;
+      border:1px solid #ffffff18;
+      min-width:54px;
+      text-align:center;
+      font-weight:700;
+      box-shadow:inset 0 -3px 0 rgba(255,255,255,.06);
+    }
+    .buttons{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    button, .linkBtn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      text-decoration:none;
+      color:#14060c;
+      font-weight:800;
+      background:linear-gradient(180deg, var(--accent3), #ff9f00);
+      padding:12px 16px;
+      border-radius:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,.25);
+    }
+    button.secondary, .linkBtn.secondary{
+      color:white;
+      background:linear-gradient(180deg, var(--accent2), #0078ff);
+    }
+    .status{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .credit{
+      margin-top:16px;
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
+    }
+    @media (max-width: 780px){
+      .hud{grid-template-columns:1fr; }
+      .controls{grid-template-columns:1fr;}
+      .arena{min-height:360px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <h1>MAHYHAKER FIGHT MODE</h1>
+      <p>Um minigame simples para colocar no seu portfólio. Vença o inimigo e depois volte para os projetos.</p>
+    </div>
+
+    <div class="hud">
+      <div class="barBox">
+        <div class="label">MAHYHAKER</div>
+        <div class="bar"><div id="playerHealth" class="fill"></div></div>
+      </div>
+
+      <div class="centerHud">
+        <div>ROUND</div>
+        <div class="big">01</div>
+      </div>
+
+      <div class="barBox">
+        <div class="label">VISITANTE BOSS</div>
+        <div class="bar"><div id="enemyHealth" class="fill"></div></div>
+      </div>
+    </div>
+
+    <div class="arena" id="arena">
+      <div class="grid"></div>
+      <div class="message show" id="message">APERTE START</div>
+
+      <div id="player" class="fighter" style="left: 120px;">
+        <div class="nameTag">MAHYHAKER</div>
+        <div class="shadow"></div>
+        <div class="body"></div>
+        <div class="legs"></div>
+        <div class="hitbox"></div>
+      </div>
+
+      <div id="enemy" class="fighter" style="left: 760px;">
+        <div class="nameTag">BOSS</div>
+        <div class="shadow"></div>
+        <div class="body"></div>
+        <div class="legs"></div>
+        <div class="hitbox"></div>
+      </div>
+
+      <div class="floor"></div>
+    </div>
+
+    <div class="controls">
+      <div class="panel">
+        <h3>Controles</h3>
+        <div class="keys">
+          <div class="key">A</div>
+          <div class="key">D</div>
+          <div class="key">W</div>
+          <div class="key">J</div>
+          <div class="key">K</div>
+        </div>
+        <div class="status">
+          A = esquerda, D = direita, W = pulo, J = soco, K = chute.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Ações</h3>
+        <div class="buttons">
+          <button id="startBtn">START FIGHT</button>
+          <button id="restartBtn" class="secondary">RESTART</button>
+          <a class="linkBtn secondary" href="index_portfolio_corrigido_clicks_ok.html">VOLTAR AO PORTFÓLIO</a>
+        </div>
+        <div class="status" id="statusText">
+          Dica: chegue perto do inimigo antes de atacar.
+        </div>
+      </div>
+    </div>
+
+    <div class="credit">
+      Você pode ligar esse arquivo ao seu portfólio com um botão “PLAY FIGHT MODE”.
+    </div>
+  </div>
+
+  <script>
+    const arena = document.getElementById('arena');
+    const playerEl = document.getElementById('player');
+    const enemyEl = document.getElementById('enemy');
+    const playerHealthEl = document.getElementById('playerHealth');
+    const enemyHealthEl = document.getElementById('enemyHealth');
+    const messageEl = document.getElementById('message');
+    const statusText = document.getElementById('statusText');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    const groundY = 0;
+    const arenaWidth = () => arena.clientWidth;
+
+    let gameStarted = false;
+    let gameOver = false;
+
+    const player = {
+      x: 120,
+      y: 0,
+      width: 90,
+      health: 100,
+      speed: 7,
+      jumping: false,
+      attacking: false,
+      facing: 1
+    };
+
+    const enemy = {
+      x: 760,
+      y: 0,
+      width: 90,
+      health: 100,
+      speed: 2.3,
+      jumping: false,
+      attacking: false,
+      facing: -1,
+      nextDecision: 0
+    };
+
+    const keys = {};
+
+    function setMessage(text, keep=false){
+      messageEl.textContent = text;
+      messageEl.classList.add('show');
+      if(!keep){
+        clearTimeout(setMessage._t);
+        setMessage._t = setTimeout(() => messageEl.classList.remove('show'), 1200);
+      }
+    }
+
+    function render(){
+      playerEl.style.left = player.x + 'px';
+      enemyEl.style.left = enemy.x + 'px';
+
+      playerEl.classList.toggle('jump', player.jumping);
+      enemyEl.classList.toggle('jump', enemy.jumping);
+
+      playerHealthEl.style.width = Math.max(0, player.health) + '%';
+      enemyHealthEl.style.width = Math.max(0, enemy.health) + '%';
+
+      const dist = enemy.x - player.x;
+      if (dist >= 0) {
+        playerEl.style.transform = 'scaleX(1)';
+        enemyEl.style.transform = 'scaleX(-1)';
+      } else {
+        playerEl.style.transform = 'scaleX(-1)';
+        enemyEl.style.transform = 'scaleX(1)';
+      }
+    }
+
+    function rectsOverlap(aLeft, aRight, bLeft, bRight){
+      return aRight >= bLeft && aLeft <= bRight;
+    }
+
+    function canHit(attacker, defender){
+      const aLeft = attacker.x;
+      const aRight = attacker.x + attacker.width + 55;
+      const dLeft = defender.x;
+      const dRight = defender.x + defender.width;
+      return rectsOverlap(aLeft, aRight, dLeft, dRight);
+    }
+
+    function attack(attackerObj, attackerEl, defenderObj, defenderEl, damage, type){
+      if (!gameStarted || gameOver || attackerObj.attacking) return;
+
+      attackerObj.attacking = true;
+      attackerEl.classList.add(type === 'kick' ? 'kicking' : 'punching');
+      attackerEl.classList.add('showHitbox');
+
+      setTimeout(() => {
+        if (canHit(attackerObj, defenderObj)) {
+          defenderObj.health = Math.max(0, defenderObj.health - damage);
+          defenderEl.classList.add('hurt');
+          statusText.textContent = type === 'kick' ? 'Acerto forte!' : 'Acerto rápido!';
+          setTimeout(() => defenderEl.classList.remove('hurt'), 180);
+
+          if (defenderObj === enemy) {
+            setMessage(type === 'kick' ? 'CRITICAL HIT!' : 'HIT!');
+          } else {
+            setMessage('O BOSS TE ACERTOU!');
+          }
+          checkWin();
+        }
+      }, 90);
+
+      setTimeout(() => {
+        attackerObj.attacking = false;
+        attackerEl.classList.remove('punching', 'kicking', 'showHitbox');
+      }, 220);
+    }
+
+    function jump(obj){
+      if (obj.jumping || gameOver) return;
+      obj.jumping = true;
+      setTimeout(() => obj.jumping = false, 520);
+    }
+
+    function checkWin(){
+      render();
+      if (enemy.health <= 0) {
+        gameOver = true;
+        gameStarted = false;
+        setMessage('VOCÊ VENCEU!', true);
+        statusText.textContent = 'Vitória! Agora você pode mandar a pessoa voltar para os projetos.';
+      } else if (player.health <= 0) {
+        gameOver = true;
+        gameStarted = false;
+        setMessage('GAME OVER', true);
+        statusText.textContent = 'Derrota. Aperte restart para jogar de novo.';
+      }
+    }
+
+    function restartGame(){
+      gameStarted = false;
+      gameOver = false;
+      player.x = 120;
+      player.health = 100;
+      player.jumping = false;
+      player.attacking = false;
+      enemy.x = Math.max(420, arenaWidth() - 260);
+      enemy.health = 100;
+      enemy.jumping = false;
+      enemy.attacking = false;
+      statusText.textContent = 'Dica: chegue perto do inimigo antes de atacar.';
+      setMessage('APERTE START', true);
+      render();
+    }
+
+    function startGame(){
+      if (gameOver) restartGame();
+      gameStarted = true;
+      messageEl.classList.remove('show');
+      statusText.textContent = 'Luta iniciada.';
+    }
+
+    function movePlayer(){
+      if (!gameStarted || gameOver) return;
+      if (keys['a']) player.x -= player.speed;
+      if (keys['d']) player.x += player.speed;
+
+      player.x = Math.max(20, Math.min(arenaWidth() - player.width - 20, player.x));
+    }
+
+    function enemyAI(ts){
+      if (!gameStarted || gameOver) return;
+      if (ts < enemy.nextDecision) return;
+
+      const distance = enemy.x - player.x;
+      const absDist = Math.abs(distance);
+
+      if (absDist > 120) {
+        enemy.x += distance > 0 ? -enemy.speed * 8 : enemy.speed * 8;
+        statusText.textContent = 'O boss está se aproximando.';
+      } else if (!enemy.attacking) {
+        if (Math.random() > 0.45) {
+          attack(enemy, enemyEl, player, playerEl, 8, 'punch');
+        } else {
+          attack(enemy, enemyEl, player, playerEl, 14, 'kick');
+        }
+      }
+
+      if (Math.random() > 0.82) jump(enemy);
+
+      enemy.x = Math.max(20, Math.min(arenaWidth() - enemy.width - 20, enemy.x));
+      enemy.nextDecision = ts + 300 + Math.random() * 320;
+    }
+
+    function gameLoop(ts){
+      movePlayer();
+      enemyAI(ts);
+      render();
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      keys[key] = true;
+
+      if (key === 'w') jump(player);
+      if (key === 'j') attack(player, playerEl, enemy, enemyEl, 10, 'punch');
+      if (key === 'k') attack(player, playerEl, enemy, enemyEl, 18, 'kick');
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', restartGame);
+
+    window.addEventListener('resize', () => {
+      enemy.x = Math.min(enemy.x, arenaWidth() - enemy.width - 20);
+      player.x = Math.min(player.x, arenaWidth() - player.width - 20);
+      render();
+    });
+
+    restartGame();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>

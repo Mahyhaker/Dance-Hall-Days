@@ -448,6 +448,9 @@
 
         .cmd-link {
             font-size: 0.45em;
+            position: relative;
+            z-index: 4;
+            pointer-events: auto;
             color: var(--muted);
             text-decoration: none;
             border: 2px solid var(--border);
@@ -604,6 +607,7 @@
         /* Pixel corner decorations */
         .featured-card::before {
             content: '';
+            pointer-events: none;
             position: absolute;
             top: 0;
             left: 0;
@@ -615,6 +619,7 @@
 
         .featured-card::after {
             content: '';
+            pointer-events: none;
             position: absolute;
             bottom: 0;
             right: 0;
@@ -709,6 +714,9 @@
 
         .card-link {
             font-size: 0.45em;
+            position: relative;
+            z-index: 4;
+            pointer-events: auto;
             color: #000;
             text-decoration: none;
             background: var(--accent);
@@ -793,6 +801,7 @@
 
         .project-row::before {
             content: '';
+            pointer-events: none;
             position: absolute;
             left: 0;
             top: 0;
@@ -868,6 +877,8 @@
 
         .row-link {
             display: flex;
+            position: relative;
+            z-index: 3;
             align-items: center;
             gap: 8px;
             justify-content: flex-end;
@@ -883,6 +894,9 @@
 
         .repo-link {
             font-size: 0.4em;
+            position: relative;
+            z-index: 4;
+            pointer-events: auto;
             color: var(--muted);
             text-decoration: none;
             border: 1px solid var(--border);
@@ -1019,6 +1033,9 @@
 
         .footer-link {
             color: var(--muted);
+            position: relative;
+            z-index: 4;
+            pointer-events: auto;
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -1227,6 +1244,11 @@
         <!-- FEATURED -->
         <div class="featured-section">
             <div class="section-label">DESTAQUE</div>
+            <div style="margin: 0 0 18px;">
+                <a href="mahyhaker_fight_mode.html" class="card-link" target="_blank">
+                    PLAY FIGHT MODE
+                </a>
+            </div>
             <div class="featured-grid">
 
                 <div class="featured-card" data-category="Web App">
@@ -1248,18 +1270,20 @@
                     </a>
                 </div>
 
-                <div class="featured-card" data-category="Data">
-                    <div class="card-number">09 — HACKATHON</div>
-                    <div class="card-title">DOMINO LINE</div>
-                    <div class="card-desc">Projeto de Data Analysis e Machine Learning desenvolvido durante hackathon
-                        com insights inovadores. Exploração de dados com visualizações e modelos preditivos aplicados a
-                        problemas reais.</div>
+                <div class="featured-card" data-category="Web App">
+                    <div class="card-number">02 — DESTAQUE</div>
+                    <div class="card-title">HCM SYSTEM</div>
+                    <div class="card-desc">Sistema completo de gestão de capital humano inspirado em soluções
+                        corporativas SAP. Reúne gestão de funcionários, departamentos, organograma organizacional,
+                        autenticação JWT e fluxo de aprovação de solicitações de ausência entre colaborador, gerente e RH.</div>
                     <div class="card-tags">
-                        <span class="tag green">Data Science</span>
-                        <span class="tag">Machine Learning</span>
-                        <span class="tag">Hackathon</span>
+                        <span class="tag green">Java 17</span>
+                        <span class="tag green">Spring Boot</span>
+                        <span class="tag teal">SAP UI5</span>
+                        <span class="tag">PostgreSQL</span>
+                        <span class="tag">JWT</span>
                     </div>
-                    <a href="https://github.com/Mahyhaker/Domino-Line" class="card-link" target="_blank">
+                    <a href="https://github.com/Mahyhaker/E.-S.-P." class="card-link" target="_blank">
                         <i class="fab fa-github"></i> VER REPOSITÓRIO
                     </a>
                 </div>
@@ -1392,7 +1416,7 @@
                 <div class="project-row" data-category="Web App">
                     <div class="row-num">08</div>
                     <div class="row-main">
-                        <div class="row-title">ALL CASPS</div>
+                        <div class="row-title">ALL CAPS</div>
                         <div class="row-desc">Landing page temática inspirada na estética Lovecraftiana, com design
                             atmosférico, sombrio e imersivo.</div>
                     </div>
@@ -1427,10 +1451,25 @@
                             macronutrientes e assistente conversacional.</div>
                     </div>
                     <div><span class="row-tag highlight">IA · DESTAQUE</span></div>
-                    <div class="row-tech">JS · Gemini</div>
+                    <div class="row-tech">HTML · CSS · JS · Gemini · API</div>
                     <div class="row-link">
                         <span class="row-arrow">►</span>
                         <a href="https://github.com/Mahyhaker/Nutri-" class="repo-link" target="_blank">GitHub</a>
+                    </div>
+                </div>
+
+                <div class="project-row" data-category="Web App">
+                    <div class="row-num">11</div>
+                    <div class="row-main">
+                        <div class="row-title">HCM SYSTEM</div>
+                        <div class="row-desc">Sistema de Human Capital Management com autenticação JWT, gestão de
+                            funcionários e departamentos, organograma e fluxo de aprovação de ausências.</div>
+                    </div>
+                    <div><span class="row-tag highlight">ENTERPRISE · DESTAQUE</span></div>
+                    <div class="row-tech">Java · Spring Boot · SAP UI5 · PostgreSQL · JWT</div>
+                    <div class="row-link">
+                        <span class="row-arrow">►</span>
+                        <a href="https://github.com/Mahyhaker/E.-S.-P." class="repo-link" target="_blank">GitHub</a>
                     </div>
                 </div>
 
@@ -1441,7 +1480,7 @@
     <div class="insert-coin">▶▶ INSERT COIN TO CONTINUE ◀◀</div>
 
     <footer>
-        <div>© 2025 MAHYHAKER — FRONT-END FIGHTER</div>
+        <div>© 2025 MAHYHAKER — DEV FIGHT MODE</div>
         <div>
             <a href="https://github.com/Mahyhaker" class="footer-link" target="_blank">
                 <i class="fab fa-github"></i> GITHUB
