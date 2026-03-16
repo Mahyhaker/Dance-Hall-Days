@@ -72,7 +72,21 @@
             color: var(--text);
             overflow-x: hidden;
             cursor: none;
-            image-rendering: pixelated;
+        }
+
+        a,
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        a:focus,
+        a:focus-visible,
+        a:active,
+        button:focus,
+        button:focus-visible,
+        button:active {
+            outline: none;
+            box-shadow: none;
         }
 
         /* PIXEL CURSOR */
@@ -517,6 +531,7 @@
         .filter-btn {
             font-family: 'Press Start 2P', monospace;
             font-size: 0.45em;
+            line-height: 1;
             padding: 8px 16px;
             border: 2px solid var(--border);
             background: #0a0015;
@@ -525,7 +540,12 @@
             transition: all 0.1s steps(2);
             letter-spacing: 0.1em;
             text-transform: uppercase;
+            text-decoration: none;
+            appearance: none;
+            -webkit-appearance: none;
             position: relative;
+            box-shadow: none;
+            text-shadow: none;
         }
 
         .filter-btn::after {
@@ -714,35 +734,34 @@
 
         .card-link {
             font-size: 0.45em;
+            line-height: 1;
             position: relative;
             z-index: 4;
             pointer-events: auto;
             color: #000;
             text-decoration: none;
             background: var(--accent);
-            padding: 8px 16px;
+            border: 2px solid #a80047;
+            padding: 10px 16px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             letter-spacing: 0.1em;
             transition: all 0.1s steps(2);
-            position: relative;
+            box-shadow: none;
+            text-shadow: none;
+            appearance: none;
+            -webkit-appearance: none;
         }
 
         .card-link::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            right: -3px;
-            width: 100%;
-            height: 100%;
-            background: #800020;
-            z-index: -1;
+            content: none;
         }
 
         .card-link:hover {
             background: var(--accent3);
-            transform: translate(-2px, -2px);
+            border-color: #c7b200;
+            transform: translateY(-1px);
         }
 
         /* PROJECTS LIST — COMBO LIST STYLE */
@@ -894,15 +913,18 @@
 
         .repo-link {
             font-size: 0.4em;
+            line-height: 1;
             position: relative;
             z-index: 4;
             pointer-events: auto;
             color: var(--muted);
             text-decoration: none;
             border: 1px solid var(--border);
-            padding: 4px 10px;
+            padding: 6px 10px;
             letter-spacing: 0.1em;
             transition: all 0.1s steps(2);
+            box-shadow: none;
+            text-shadow: none;
         }
 
         .repo-link:hover {
@@ -1470,6 +1492,20 @@
                     <div class="row-link">
                         <span class="row-arrow">►</span>
                         <a href="https://github.com/Mahyhaker/E.-S.-P." class="repo-link" target="_blank">GitHub</a>
+                    </div>
+                </div>
+
+                <div class="project-row" data-category="Web App">
+                    <div class="row-num">12</div>
+                    <div class="row-main">
+                        <div class="row-title">LOWDOWN</div>
+                        <div class="row-desc">Projeto de automação de testes web com Selenium WebDriver e Pytest, com foco em validação de fluxos automatizados e organização do código.</div>
+                    </div>
+                    <div><span class="row-tag highlight">QA · AUTOMAÇÃO</span></div>
+                    <div class="row-tech">Python · Selenium · Pytest</div>
+                    <div class="row-link">
+                        <span class="row-arrow">►</span>
+                        <a href="https://github.com/Mahyhaker/Lowdown-" class="repo-link" target="_blank">GitHub</a>
                     </div>
                 </div>
 
