@@ -1,603 +1,977 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mahyhaker Fight Mode</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MAHYHAKER — FIGHT MODE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
     :root{
-      --bg:#0a0008;
-      --bg2:#18001f;
-      --surface:#1b0326;
+      --bg:#060010;
+      --surface:#0e0020;
       --accent:#ff2d78;
       --accent2:#00e5ff;
       --accent3:#ffe600;
+      --good:#00ff6a;
+      --bad:#ff4444;
+      --purple:#c026d3;
       --text:#f0e8ff;
-      --muted:#ad98bf;
-      --good:#00ff7b;
-      --bad:#ff4d4d;
-      --border:#4a1260;
+      --muted:#8b7aa0;
+      --border:#3a1050;
     }
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;overflow-x:hidden}
     body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:radial-gradient(circle at top, #1a0030 0%, var(--bg) 55%);
+      font-family:'Rajdhani',sans-serif;
+      background:var(--bg);
       color:var(--text);
       min-height:100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(192,38,211,.22) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 30% at 80% 100%, rgba(255,45,120,.12) 0%, transparent 50%);
     }
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:20px;
-    }
-    .title{
-      text-align:center;
-      margin-bottom:18px;
-    }
+    .wrap{max-width:1100px;margin:0 auto;padding:16px 20px 24px}
+
+    /* ─── TITLE ─── */
+    .title{text-align:center;margin-bottom:14px;position:relative}
     .title h1{
-      margin:0 0 6px;
-      font-size:clamp(28px, 5vw, 48px);
-      letter-spacing:2px;
+      font-family:'Black Ops One',cursive;
+      font-size:clamp(26px,5vw,52px);
+      letter-spacing:4px;
       color:var(--accent3);
-      text-shadow:0 0 16px rgba(255,230,0,.35);
+      text-shadow:0 0 30px rgba(255,230,0,.5),0 0 60px rgba(255,230,0,.2);
+      line-height:1;
     }
-    .title p{
-      margin:0;
-      color:var(--muted);
+    .title .sub{
+      font-size:13px;letter-spacing:3px;text-transform:uppercase;
+      color:var(--muted);margin-top:6px;
+    }
+    .vs-badge{
+      display:inline-block;
+      font-family:'Black Ops One',cursive;
+      font-size:11px;letter-spacing:2px;
+      color:var(--accent);
+      border:1px solid var(--accent);
+      padding:2px 8px;border-radius:4px;
+      margin-left:8px;vertical-align:middle;
+      box-shadow:0 0 8px rgba(255,45,120,.3);
     }
 
+    /* ─── HUD ─── */
     .hud{
       display:grid;
-      grid-template-columns:1fr auto 1fr;
-      gap:14px;
-      align-items:center;
-      margin:14px 0 18px;
-    }
-    .barBox{
-      background:rgba(0,0,0,.45);
-      border:2px solid var(--border);
-      padding:10px;
-      border-radius:14px;
-      box-shadow:0 12px 28px rgba(0,0,0,.28);
-    }
-    .label{
-      font-weight:700;
-      margin-bottom:8px;
-      color:var(--accent2);
-    }
-    .bar{
-      height:22px;
-      background:#09020d;
-      border:2px solid #fff3;
-      border-radius:999px;
-      overflow:hidden;
-    }
-    .fill{
-      height:100%;
-      width:100%;
-      transition:width .12s linear;
-    }
-    #playerHealth{background:linear-gradient(90deg, var(--good), #89ff00);}
-    #enemyHealth{background:linear-gradient(90deg, var(--bad), #ff8a00);}
-    .centerHud{
-      min-width:140px;
-      text-align:center;
-      background:rgba(0,0,0,.45);
-      border:2px solid var(--accent3);
-      border-radius:14px;
-      padding:10px 14px;
-      box-shadow:0 12px 28px rgba(0,0,0,.28);
-    }
-    .centerHud .big{
-      font-size:28px;
-      font-weight:800;
-      color:var(--accent3);
-    }
-    .arena{
-      position:relative;
-      width:100%;
-      aspect-ratio:16/9;
-      min-height:430px;
-      overflow:hidden;
-      border:3px solid var(--accent);
-      border-radius:22px;
-      background:
-        linear-gradient(to top, rgba(255,45,120,.12), transparent 35%),
-        linear-gradient(to top, #311248 0%, #1a0730 42%, #0f0221 100%);
-      box-shadow:0 18px 44px rgba(0,0,0,.35);
-    }
-    .grid{
-      position:absolute;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(0,229,255,.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,229,255,.08) 1px, transparent 1px);
-      background-size:40px 40px;
-      pointer-events:none;
-    }
-    .floor{
-      position:absolute;
-      left:0; right:0; bottom:0;
-      height:24%;
-      background:
-        linear-gradient(to top, rgba(0,0,0,.4), transparent 70%),
-        repeating-linear-gradient(90deg, rgba(255,230,0,.18) 0 16px, transparent 16px 32px),
-        linear-gradient(to top, #4f1240, #1c0723);
-      border-top:3px solid var(--accent3);
-    }
-    .fighter{
-      position:absolute;
-      bottom:20%;
-      width:90px;
-      height:150px;
-      transform-origin:50% 100%;
-      transition:transform .05s linear;
-    }
-    .fighter .shadow{
-      position:absolute;
-      left:8px;
-      bottom:-8px;
-      width:74px;
-      height:16px;
-      background:rgba(0,0,0,.34);
-      filter:blur(3px);
-      border-radius:50%;
-    }
-    .fighter .body{
-      position:absolute;
-      inset:0;
-      border-radius:16px 16px 10px 10px;
-      border:3px solid #ffffff25;
-      box-shadow:inset 0 0 0 2px #00000028, 0 8px 18px rgba(0,0,0,.25);
-    }
-    #player .body{
-      background:
-        radial-gradient(circle at 50% 22%, #fff3 0 11px, transparent 12px),
-        linear-gradient(to bottom, #00d4ff 0 24%, #2533ff 24% 62%, #0f0c1f 62% 100%);
-    }
-    #enemy .body{
-      background:
-        radial-gradient(circle at 50% 22%, #fff3 0 11px, transparent 12px),
-        linear-gradient(to bottom, #ff7a00 0 24%, #ff174f 24% 62%, #220914 62% 100%);
-    }
-    .fighter::before, .fighter::after{
-      content:"";
-      position:absolute;
-      background:#e6d2c5;
-      border-radius:12px;
-    }
-    .fighter::before{
-      width:18px;height:54px;left:-6px;top:48px;transform:rotate(8deg);
-    }
-    .fighter::after{
-      width:18px;height:54px;right:-6px;top:48px;transform:rotate(-8deg);
-    }
-    .fighter .legs::before, .fighter .legs::after{
-      content:"";
-      position:absolute;
-      width:20px;height:62px;bottom:-4px;background:#101019;border-radius:10px;
-    }
-    .fighter .legs::before{left:18px;}
-    .fighter .legs::after{right:18px;}
-    #enemy{transform:scaleX(-1);}
-    .nameTag{
-      position:absolute;
-      bottom:100%;
-      left:50%;
-      transform:translateX(-50%);
-      white-space:nowrap;
-      font-size:12px;
-      font-weight:700;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(0,0,0,.5);
-      border:1px solid #ffffff24;
+      grid-template-columns:1fr 130px 1fr;
+      gap:10px;align-items:center;
       margin-bottom:10px;
     }
-    .hitbox{
-      position:absolute;
-      width:64px;
-      height:54px;
-      top:44px;
-      right:-56px;
-      border:2px dashed rgba(255,230,0,.0);
-      border-radius:10px;
-      pointer-events:none;
+    .barBox{
+      background:rgba(0,0,0,.55);
+      border:1px solid var(--border);
+      padding:10px 14px;border-radius:12px;
+      box-shadow:0 0 20px rgba(0,0,0,.4);
     }
-    .showHitbox .hitbox{border-color:rgba(255,230,0,.35);}
-    .jump{transform:translateY(-120px) !important;}
-    .punching .body{filter:brightness(1.18);}
-    .kicking .body{filter:saturate(1.2) brightness(1.12);}
-    .hurt .body{filter:brightness(1.3) saturate(.75);}
-    .message{
-      position:absolute;
-      left:50%;
-      top:14%;
-      transform:translateX(-50%);
-      background:rgba(0,0,0,.62);
-      border:2px solid var(--accent3);
-      color:var(--accent3);
-      padding:12px 18px;
-      border-radius:14px;
-      font-weight:800;
-      letter-spacing:1px;
-      box-shadow:0 12px 26px rgba(0,0,0,.3);
-      opacity:0;
-      transition:opacity .2s;
+    .barBox.right{text-align:right}
+    .barLabel{
+      font-family:'Black Ops One',cursive;
+      font-size:13px;letter-spacing:2px;
+      color:var(--accent2);margin-bottom:6px;
     }
-    .message.show{opacity:1;}
-    .controls{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:16px;
-      margin-top:18px;
+    .barLabel.right{color:var(--bad)}
+    .barOuter{
+      height:18px;background:#0a001a;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;overflow:hidden;position:relative;
     }
-    .panel{
-      background:rgba(255,255,255,.04);
-      border:2px solid var(--border);
+    .barFill{
+      height:100%;width:100%;
+      transition:width .08s linear;
+      border-radius:999px;
+    }
+    #playerHealth{
+      background:linear-gradient(90deg,#00c853,#69ff47);
+      box-shadow:0 0 8px rgba(105,255,71,.5);
+    }
+    #enemyHealth{
+      background:linear-gradient(90deg,#ff1744,#ff6d00);
+      box-shadow:0 0 8px rgba(255,23,68,.5);float:right;
+    }
+    .hpNum{font-size:11px;color:var(--muted);margin-top:3px;font-weight:700}
+
+    /* SPECIAL BAR */
+    .specialRow{display:flex;gap:4px;margin-top:5px}
+    .specialPip{
+      flex:1;height:6px;border-radius:999px;
+      background:rgba(255,255,255,.07);
+      transition:background .2s;
+    }
+    .specialPip.full{background:var(--accent3);box-shadow:0 0 5px rgba(255,230,0,.6)}
+
+    /* CENTER HUD */
+    .centerHud{
+      text-align:center;
+      background:rgba(0,0,0,.6);
+      border:1px solid var(--accent3);
+      border-radius:12px;padding:8px 10px;
+      box-shadow:0 0 20px rgba(255,230,0,.15);
+    }
+    .roundLabel{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+    .roundNum{
+      font-family:'Black Ops One',cursive;
+      font-size:28px;color:var(--accent3);
+      text-shadow:0 0 14px rgba(255,230,0,.4);
+      line-height:1;
+    }
+    .timerNum{
+      font-family:'Black Ops One',cursive;
+      font-size:14px;color:var(--text);margin-top:2px;
+    }
+
+    /* ─── ARENA ─── */
+    .arena{
+      position:relative;
+      width:100%;aspect-ratio:16/9;min-height:380px;
+      overflow:hidden;
+      border:2px solid var(--accent);
       border-radius:18px;
-      padding:16px;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% 10%, rgba(192,38,211,.18) 0%, transparent 60%),
+        linear-gradient(to top, #2a0a40 0%, #160330 40%, #0a0118 100%);
+      box-shadow:0 0 40px rgba(255,45,120,.18), inset 0 0 60px rgba(0,0,0,.5);
     }
-    .panel h3{
-      margin:0 0 10px;
+    /* CRT scanlines */
+    .arena::after{
+      content:'';position:absolute;inset:0;pointer-events:none;z-index:100;
+      background:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0,rgba(0,0,0,.08) 1px,transparent 1px,transparent 3px);
+      border-radius:16px;
+    }
+    .grid{
+      position:absolute;inset:0;pointer-events:none;
+      background-image:
+        linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);
+      background-size:44px 44px;
+    }
+    .floor{
+      position:absolute;left:0;right:0;bottom:0;height:22%;
+      background:
+        linear-gradient(to top,rgba(0,0,0,.6),transparent 70%),
+        repeating-linear-gradient(90deg,rgba(255,230,0,.10) 0 12px,transparent 12px 24px),
+        linear-gradient(to top,#1a0535,#0d0222);
+      border-top:2px solid rgba(255,230,0,.4);
+    }
+    .floorGlow{
+      position:absolute;left:10%;right:10%;bottom:22%;
+      height:6px;
+      background:radial-gradient(ellipse,rgba(255,230,0,.35) 0%,transparent 70%);
+      filter:blur(6px);pointer-events:none;
+    }
+    .bgLights{
+      position:absolute;inset:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 30% 40% at 20% 80%,rgba(192,38,211,.12) 0%,transparent 60%),
+        radial-gradient(ellipse 30% 40% at 80% 80%,rgba(255,45,120,.10) 0%,transparent 60%);
+    }
+
+    /* ─── FIGHTERS ─── */
+    .fighter{
+      position:absolute;
+      bottom:21%;
+      width:70px;height:120px;
+      transform-origin:50% 100%;
+      will-change:transform,left;
+    }
+    .fighter svg{width:100%;height:100%;overflow:visible}
+    .nameTag{
+      position:absolute;bottom:calc(100% + 6px);left:50%;
+      transform:translateX(-50%);white-space:nowrap;
+      font-family:'Black Ops One',cursive;
+      font-size:11px;letter-spacing:1.5px;
+      padding:3px 10px;border-radius:999px;
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.15);
       color:var(--accent2);
     }
-    .keys{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:8px;
+    #enemy .nameTag{color:var(--bad)}
+    .shadow{
+      position:absolute;left:5px;bottom:-8px;
+      width:60px;height:12px;
+      background:rgba(0,0,0,.4);
+      filter:blur(5px);border-radius:50%;
     }
+
+    /* Fighter animations */
+    .fighter.jump{animation:jumpAnim .5s cubic-bezier(.22,.7,.34,1) forwards}
+    @keyframes jumpAnim{
+      0%{transform:translateY(0) scaleX(var(--fx,1))}
+      40%{transform:translateY(-110px) scaleX(var(--fx,1))}
+      100%{transform:translateY(0) scaleX(var(--fx,1))}
+    }
+    .fighter.punch{animation:punchAnim .22s ease-out}
+    @keyframes punchAnim{
+      0%{transform:scaleX(var(--fx,1)) scaleY(1)}
+      50%{transform:scaleX(var(--fx,1)) scaleY(1.06) translateX(calc(var(--fx,1)*8px))}
+      100%{transform:scaleX(var(--fx,1)) scaleY(1)}
+    }
+    .fighter.kick{animation:kickAnim .25s ease-out}
+    @keyframes kickAnim{
+      0%{transform:scaleX(var(--fx,1)) rotate(0)}
+      40%{transform:scaleX(var(--fx,1)) rotate(calc(var(--fx,1)*-8deg))}
+      100%{transform:scaleX(var(--fx,1)) rotate(0)}
+    }
+    .fighter.special{animation:specialAnim .4s ease-out}
+    @keyframes specialAnim{
+      0%{transform:scaleX(var(--fx,1)) scale(1)}
+      20%{transform:scaleX(var(--fx,1)) scale(1.2)}
+      60%{transform:scaleX(var(--fx,1)) scale(.95) translateX(calc(var(--fx,1)*20px))}
+      100%{transform:scaleX(var(--fx,1)) scale(1)}
+    }
+    .fighter.hurt{animation:hurtAnim .18s ease-out}
+    @keyframes hurtAnim{
+      0%{transform:scaleX(var(--fx,1)) translateX(0)}
+      30%{transform:scaleX(var(--fx,1)) translateX(calc(var(--fx,1)*-10px))}
+      100%{transform:scaleX(var(--fx,1)) translateX(0)}
+    }
+    .fighter.ko{animation:koAnim .5s forwards}
+    @keyframes koAnim{
+      0%{transform:scaleX(var(--fx,1)) rotate(0) translateY(0)}
+      60%{transform:scaleX(var(--fx,1)) rotate(calc(var(--fx,1)*-70deg)) translateY(-10px)}
+      100%{transform:scaleX(var(--fx,1)) rotate(calc(var(--fx,1)*-90deg)) translateY(20px)}
+    }
+
+    /* ─── HIT EFFECT ─── */
+    .hitEffect{
+      position:absolute;pointer-events:none;z-index:50;
+      font-family:'Black Ops One',cursive;font-size:22px;
+      font-weight:900;letter-spacing:2px;
+      animation:hitPop .5s forwards;
+    }
+    @keyframes hitPop{
+      0%{opacity:1;transform:scale(.6) rotate(-10deg)}
+      30%{opacity:1;transform:scale(1.15) rotate(4deg)}
+      80%{opacity:.9;transform:scale(1) rotate(0)}
+      100%{opacity:0;transform:scale(.9) translateY(-20px)}
+    }
+    .spark{
+      position:absolute;pointer-events:none;z-index:50;
+      width:8px;height:8px;border-radius:50%;
+      animation:sparkFly .45s forwards;
+    }
+    @keyframes sparkFly{
+      0%{opacity:1;transform:translate(0,0) scale(1)}
+      100%{opacity:0;transform:translate(var(--sx,20px),var(--sy,-30px)) scale(0)}
+    }
+    .screenFlash{
+      position:absolute;inset:0;z-index:90;border-radius:16px;
+      pointer-events:none;opacity:0;
+      animation:flash .18s forwards;
+    }
+    @keyframes flash{
+      0%{opacity:.35}100%{opacity:0}
+    }
+
+    /* ─── MESSAGES ─── */
+    .message{
+      position:absolute;left:50%;top:12%;
+      transform:translateX(-50%);
+      font-family:'Black Ops One',cursive;
+      font-size:clamp(18px,3vw,30px);
+      letter-spacing:3px;
+      padding:10px 22px;border-radius:12px;
+      background:rgba(0,0,0,.7);
+      border:2px solid var(--accent3);
+      color:var(--accent3);
+      text-shadow:0 0 14px rgba(255,230,0,.5);
+      box-shadow:0 0 24px rgba(255,230,0,.2);
+      opacity:0;transition:opacity .18s;
+      white-space:nowrap;z-index:60;pointer-events:none;
+    }
+    .message.show{opacity:1}
+    .message.win{border-color:var(--good);color:var(--good);text-shadow:0 0 14px rgba(0,255,106,.5)}
+    .message.lose{border-color:var(--bad);color:var(--bad);text-shadow:0 0 14px rgba(255,68,68,.5)}
+
+    /* COMBO */
+    .comboDisplay{
+      position:absolute;right:14px;top:14px;
+      font-family:'Black Ops One',cursive;
+      font-size:clamp(14px,2.5vw,22px);
+      color:var(--accent3);
+      text-shadow:0 0 10px rgba(255,230,0,.6);
+      opacity:0;transition:opacity .2s;
+      pointer-events:none;z-index:60;
+    }
+    .comboDisplay.show{opacity:1}
+
+    /* ─── CONTROLS ─── */
+    .controls{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;margin-top:12px;
+    }
+    .panel{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:14px;padding:14px 16px;
+    }
+    .panel h3{
+      font-family:'Black Ops One',cursive;
+      font-size:14px;letter-spacing:2px;
+      color:var(--accent2);margin-bottom:10px;
+    }
+    .keys{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
     .key{
-      padding:10px 12px;
-      border-radius:12px;
-      background:#0d0714;
-      border:1px solid #ffffff18;
-      min-width:54px;
-      text-align:center;
-      font-weight:700;
-      box-shadow:inset 0 -3px 0 rgba(255,255,255,.06);
+      padding:7px 11px;border-radius:8px;
+      background:#0d001a;
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:700;font-size:13px;
+      min-width:44px;text-align:center;
+      box-shadow:inset 0 -3px 0 rgba(0,0,0,.4);
     }
-    .buttons{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:10px;
+    .key .label2{font-size:10px;color:var(--muted);display:block;font-weight:400}
+    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .btn{
+      appearance:none;border:none;cursor:pointer;
+      font-family:'Black Ops One',cursive;
+      font-size:13px;letter-spacing:1px;
+      padding:10px 16px;border-radius:10px;
+      transition:transform .1s,box-shadow .1s;
     }
-    button, .linkBtn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      text-decoration:none;
-      color:#14060c;
-      font-weight:800;
-      background:linear-gradient(180deg, var(--accent3), #ff9f00);
-      padding:12px 16px;
-      border-radius:14px;
-      box-shadow:0 10px 22px rgba(0,0,0,.25);
+    .btn:active{transform:scale(.96)}
+    .btn.primary{
+      color:#100006;
+      background:linear-gradient(180deg,var(--accent3),#ff9f00);
+      box-shadow:0 4px 16px rgba(255,230,0,.35);
     }
-    button.secondary, .linkBtn.secondary{
-      color:white;
-      background:linear-gradient(180deg, var(--accent2), #0078ff);
+    .btn.secondary{
+      color:#fff;
+      background:linear-gradient(180deg,var(--accent2),#006aff);
+      box-shadow:0 4px 16px rgba(0,229,255,.25);
+    }
+    .btn.danger{
+      color:#fff;
+      background:linear-gradient(180deg,var(--accent),#d00046);
+      box-shadow:0 4px 16px rgba(255,45,120,.25);
     }
     .status{
-      margin-top:8px;
-      color:var(--muted);
-      font-size:14px;
+      margin-top:8px;font-size:13px;
+      color:var(--muted);line-height:1.4;
     }
-    .credit{
-      margin-top:16px;
+
+    /* ─── MOBILE TOUCH PAD ─── */
+    .mobilePad{
+      display:none;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;margin-top:12px;
+    }
+    .padBtn{
+      appearance:none;border:none;cursor:pointer;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);font-family:'Black Ops One',cursive;
+      font-size:16px;padding:14px 8px;border-radius:12px;
+      user-select:none;-webkit-user-select:none;
+      transition:background .1s,transform .1s;
       text-align:center;
-      color:var(--muted);
-      font-size:14px;
     }
-    @media (max-width: 780px){
-      .hud{grid-template-columns:1fr; }
-      .controls{grid-template-columns:1fr;}
-      .arena{min-height:360px;}
+    .padBtn:active,.padBtn.active{
+      background:rgba(255,230,0,.2);
+      border-color:var(--accent3);
+      transform:scale(.93);
     }
+    .padBtn.attack{background:rgba(255,45,120,.15);border-color:var(--accent)}
+    .padBtn.special-btn{background:rgba(192,38,211,.18);border-color:var(--purple)}
+
+    @media (max-width:700px){
+      .hud{grid-template-columns:1fr 90px 1fr}
+      .controls{grid-template-columns:1fr}
+      .mobilePad{display:grid}
+      .roundNum{font-size:22px}
+      .centerHud{padding:6px 8px}
+    }
+    @media (max-width:480px){
+      .hud{grid-template-columns:1fr}
+      .centerHud{display:none}
+    }
+
+    .credit{text-align:center;color:var(--muted);font-size:12px;margin-top:14px;letter-spacing:1px}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="title">
-      <h1>MAHYHAKER FIGHT MODE</h1>
-      <p>Um minigame simples para colocar no seu portfólio. Vença o inimigo e depois volte para os projetos.</p>
+<div class="wrap">
+
+  <!-- TITLE -->
+  <div class="title">
+    <h1>MAHYHAKER <span class="vs-badge">VS</span></h1>
+    <div class="sub">Fight Mode — Portfólio Edition</div>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="barBox">
+      <div class="barLabel">⚡ MAHYHAKER</div>
+      <div class="barOuter"><div id="playerHealth" class="barFill"></div></div>
+      <div class="hpNum" id="playerHpNum">100 HP</div>
+      <div class="specialRow" id="playerSpecialPips"></div>
     </div>
-
-    <div class="hud">
-      <div class="barBox">
-        <div class="label">MAHYHAKER</div>
-        <div class="bar"><div id="playerHealth" class="fill"></div></div>
-      </div>
-
-      <div class="centerHud">
-        <div>ROUND</div>
-        <div class="big">01</div>
-      </div>
-
-      <div class="barBox">
-        <div class="label">VISITANTE BOSS</div>
-        <div class="bar"><div id="enemyHealth" class="fill"></div></div>
-      </div>
+    <div class="centerHud">
+      <div class="roundLabel">Round</div>
+      <div class="roundNum" id="roundNum">01</div>
+      <div class="timerNum" id="timerNum">60</div>
     </div>
-
-    <div class="arena" id="arena">
-      <div class="grid"></div>
-      <div class="message show" id="message">APERTE START</div>
-
-      <div id="player" class="fighter" style="left: 120px;">
-        <div class="nameTag">MAHYHAKER</div>
-        <div class="shadow"></div>
-        <div class="body"></div>
-        <div class="legs"></div>
-        <div class="hitbox"></div>
-      </div>
-
-      <div id="enemy" class="fighter" style="left: 760px;">
-        <div class="nameTag">BOSS</div>
-        <div class="shadow"></div>
-        <div class="body"></div>
-        <div class="legs"></div>
-        <div class="hitbox"></div>
-      </div>
-
-      <div class="floor"></div>
-    </div>
-
-    <div class="controls">
-      <div class="panel">
-        <h3>Controles</h3>
-        <div class="keys">
-          <div class="key">A</div>
-          <div class="key">D</div>
-          <div class="key">W</div>
-          <div class="key">J</div>
-          <div class="key">K</div>
-        </div>
-        <div class="status">
-          A = esquerda, D = direita, W = pulo, J = soco, K = chute.
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Ações</h3>
-        <div class="buttons">
-          <button id="startBtn">START FIGHT</button>
-          <button id="restartBtn" class="secondary">RESTART</button>
-          <a class="linkBtn secondary" href="index_portfolio_corrigido_clicks_ok.html">VOLTAR AO PORTFÓLIO</a>
-        </div>
-        <div class="status" id="statusText">
-          Dica: chegue perto do inimigo antes de atacar.
-        </div>
-      </div>
-    </div>
-
-    <div class="credit">
-      Você pode ligar esse arquivo ao seu portfólio com um botão “PLAY FIGHT MODE”.
+    <div class="barBox right">
+      <div class="barLabel right">BOSS FINAL ⚡</div>
+      <div class="barOuter"><div id="enemyHealth" class="barFill" style="float:right"></div></div>
+      <div class="hpNum" id="enemyHpNum">100 HP</div>
+      <div class="specialRow" id="enemySpecialPips"></div>
     </div>
   </div>
 
-  <script>
-    const arena = document.getElementById('arena');
-    const playerEl = document.getElementById('player');
-    const enemyEl = document.getElementById('enemy');
-    const playerHealthEl = document.getElementById('playerHealth');
-    const enemyHealthEl = document.getElementById('enemyHealth');
-    const messageEl = document.getElementById('message');
-    const statusText = document.getElementById('statusText');
-    const startBtn = document.getElementById('startBtn');
-    const restartBtn = document.getElementById('restartBtn');
+  <!-- ARENA -->
+  <div class="arena" id="arena">
+    <div class="grid"></div>
+    <div class="bgLights"></div>
 
-    const groundY = 0;
-    const arenaWidth = () => arena.clientWidth;
+    <!-- PLAYER (SVG fighter) -->
+    <div id="player" class="fighter" style="left:110px;--fx:1">
+      <div class="nameTag">MAHYHAKER</div>
+      <div class="shadow"></div>
+      <svg viewBox="0 0 70 120" xmlns="http://www.w3.org/2000/svg">
+        <!-- body -->
+        <rect x="20" y="32" width="30" height="40" rx="6" fill="#1a90ff"/>
+        <rect x="20" y="32" width="30" height="14" rx="5" fill="#00c8ff"/>
+        <!-- head -->
+        <ellipse cx="35" cy="22" rx="14" ry="15" fill="#ffe0b2"/>
+        <!-- hair -->
+        <ellipse cx="35" cy="10" rx="13" ry="8" fill="#222"/>
+        <rect x="22" y="8" width="26" height="8" fill="#222" rx="2"/>
+        <!-- visor / eyes -->
+        <rect x="24" y="19" width="22" height="7" rx="3" fill="#00e5ff" opacity=".85"/>
+        <!-- arms -->
+        <rect x="8" y="36" width="14" height="32" rx="6" fill="#1a90ff" id="playerArmL"/>
+        <rect x="48" y="36" width="14" height="32" rx="6" fill="#1a90ff" id="playerArmR"/>
+        <!-- fist L -->
+        <ellipse cx="15" cy="70" rx="8" ry="7" fill="#ffe0b2"/>
+        <!-- fist R -->
+        <ellipse cx="55" cy="70" rx="8" ry="7" fill="#ffe0b2"/>
+        <!-- legs -->
+        <rect x="22" y="70" width="12" height="38" rx="6" fill="#0f2060"/>
+        <rect x="36" y="70" width="12" height="38" rx="6" fill="#0f2060"/>
+        <!-- boots -->
+        <rect x="20" y="100" width="16" height="12" rx="4" fill="#111"/>
+        <rect x="34" y="100" width="16" height="12" rx="4" fill="#111"/>
+        <!-- chest detail -->
+        <rect x="28" y="44" width="14" height="3" rx="1.5" fill="#00e5ff" opacity=".6"/>
+        <rect x="30" y="50" width="10" height="3" rx="1.5" fill="#00e5ff" opacity=".4"/>
+      </svg>
+    </div>
 
-    let gameStarted = false;
-    let gameOver = false;
+    <!-- ENEMY (SVG boss) -->
+    <div id="enemy" class="fighter" style="left:800px;--fx:-1">
+      <div class="nameTag">BOSS</div>
+      <div class="shadow"></div>
+      <svg viewBox="0 0 70 120" xmlns="http://www.w3.org/2000/svg">
+        <!-- body -->
+        <rect x="18" y="32" width="34" height="42" rx="7" fill="#8b0000"/>
+        <rect x="18" y="32" width="34" height="15" rx="6" fill="#cc1a00"/>
+        <!-- head big -->
+        <ellipse cx="35" cy="21" rx="16" ry="17" fill="#cc4a1a"/>
+        <!-- horns -->
+        <polygon points="22,8 17,0 27,8" fill="#222"/>
+        <polygon points="48,8 53,0 43,8" fill="#222"/>
+        <!-- eyes glow -->
+        <ellipse cx="28" cy="20" rx="5" ry="5" fill="#ff0000" opacity=".9"/>
+        <ellipse cx="42" cy="20" rx="5" ry="5" fill="#ff0000" opacity=".9"/>
+        <ellipse cx="28" cy="20" rx="2.5" ry="2.5" fill="#fff" opacity=".8"/>
+        <ellipse cx="42" cy="20" rx="2.5" ry="2.5" fill="#fff" opacity=".8"/>
+        <!-- scar -->
+        <line x1="33" y1="16" x2="38" y2="28" stroke="#7b1a00" stroke-width="2"/>
+        <!-- arms thick -->
+        <rect x="4" y="34" width="16" height="36" rx="7" fill="#6b0000"/>
+        <rect x="50" y="34" width="16" height="36" rx="7" fill="#6b0000"/>
+        <!-- knuckles -->
+        <ellipse cx="12" cy="72" rx="9" ry="8" fill="#7a3000"/>
+        <ellipse cx="58" cy="72" rx="9" ry="8" fill="#7a3000"/>
+        <!-- legs -->
+        <rect x="21" y="72" width="13" height="36" rx="6" fill="#400000"/>
+        <rect x="36" y="72" width="13" height="36" rx="6" fill="#400000"/>
+        <!-- boots spikes -->
+        <rect x="18" y="100" width="18" height="13" rx="4" fill="#1a0000"/>
+        <rect x="34" y="100" width="18" height="13" rx="4" fill="#1a0000"/>
+        <!-- spikes on boots -->
+        <polygon points="24,100 27,93 30,100" fill="#ff4400"/>
+        <polygon points="40,100 43,93 46,100" fill="#ff4400"/>
+        <!-- chest armor plate -->
+        <rect x="24" y="46" width="22" height="14" rx="4" fill="#6b0000"/>
+        <rect x="28" y="49" width="14" height="4" rx="2" fill="#ff2200" opacity=".5"/>
+      </svg>
+    </div>
 
-    const player = {
-      x: 120,
-      y: 0,
-      width: 90,
-      health: 100,
-      speed: 7,
-      jumping: false,
-      attacking: false,
-      facing: 1
-    };
+    <div class="floorGlow"></div>
+    <div class="floor"></div>
 
-    const enemy = {
-      x: 760,
-      y: 0,
-      width: 90,
-      health: 100,
-      speed: 2.3,
-      jumping: false,
-      attacking: false,
-      facing: -1,
-      nextDecision: 0
-    };
+    <div class="message show" id="message">APERTE START</div>
+    <div class="comboDisplay" id="comboDisplay"></div>
+  </div>
 
-    const keys = {};
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="panel">
+      <h3>🎮 Controles</h3>
+      <div class="keys">
+        <div class="key">A<span class="label2">← mover</span></div>
+        <div class="key">D<span class="label2">→ mover</span></div>
+        <div class="key">W<span class="label2">↑ pulo</span></div>
+        <div class="key">J<span class="label2">soco</span></div>
+        <div class="key">K<span class="label2">chute</span></div>
+        <div class="key" style="border-color:rgba(192,38,211,.4);color:#c026d3">L<span class="label2">ESPECIAL</span></div>
+      </div>
+      <div class="status">Quando a barra especial estiver cheia (5 pips), use <b style="color:var(--accent3)">L</b> para um ataque devastador!</div>
+    </div>
+    <div class="panel">
+      <h3>⚡ Ações</h3>
+      <div class="btns">
+        <button class="btn primary" id="startBtn">▶ START FIGHT</button>
+        <button class="btn secondary" id="restartBtn">↺ RESTART</button>
+      </div>
+      <div class="status" id="statusText">Dica: chegue perto do inimigo antes de atacar!</div>
+    </div>
+  </div>
 
-    function setMessage(text, keep=false){
-      messageEl.textContent = text;
-      messageEl.classList.add('show');
-      if(!keep){
-        clearTimeout(setMessage._t);
-        setMessage._t = setTimeout(() => messageEl.classList.remove('show'), 1200);
-      }
-    }
+  <!-- MOBILE PAD -->
+  <div class="mobilePad" id="mobilePad">
+    <button class="padBtn" id="padLeft">◀ ESQ</button>
+    <button class="padBtn" id="padJump">▲ PULO</button>
+    <button class="padBtn" id="padRight">DIR ▶</button>
+    <button class="padBtn attack" id="padPunch">👊 SOCO</button>
+    <button class="padBtn special-btn" id="padSpecial">⚡ ESP.</button>
+    <button class="padBtn attack" id="padKick">🦶 CHUTE</button>
+  </div>
 
-    function render(){
-      playerEl.style.left = player.x + 'px';
-      enemyEl.style.left = enemy.x + 'px';
+  <div class="credit">Mahyhaker Fight Mode — Cole no seu portfólio com um botão "PLAY FIGHT MODE" ✨</div>
+</div>
 
-      playerEl.classList.toggle('jump', player.jumping);
-      enemyEl.classList.toggle('jump', enemy.jumping);
+<script>
+// ── AUDIO ──
+const AC = window.AudioContext || window.webkitAudioContext;
+let ac;
+function getAC(){ if(!ac) ac = new AC(); return ac; }
+function playTone(freq, type, dur, gain=0.18){
+  try{
+    const a = getAC();
+    const o = a.createOscillator();
+    const g = a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(gain, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + dur);
+    o.start(a.currentTime); o.stop(a.currentTime + dur);
+  }catch(e){}
+}
+function sfxPunch(){ playTone(180,'sawtooth',.09,.22); playTone(320,'square',.06,.15) }
+function sfxKick(){ playTone(120,'sawtooth',.15,.28); playTone(80,'sine',.12,.2) }
+function sfxSpecial(){
+  [440,550,660,880].forEach((f,i)=>{
+    setTimeout(()=>playTone(f,'square',.12,.3),i*40);
+  });
+}
+function sfxHurt(){ playTone(100,'sawtooth',.2,.3) }
+function sfxKO(){ [300,200,100,60].forEach((f,i)=>setTimeout(()=>playTone(f,'sawtooth',.25,.35),i*70)) }
+function sfxWin(){ [440,550,660,880,1100].forEach((f,i)=>setTimeout(()=>playTone(f,'square',.18,.4),i*80)) }
 
-      playerHealthEl.style.width = Math.max(0, player.health) + '%';
-      enemyHealthEl.style.width = Math.max(0, enemy.health) + '%';
+// ── DOM ──
+const arena = document.getElementById('arena');
+const playerEl = document.getElementById('player');
+const enemyEl = document.getElementById('enemy');
+const playerHealthEl = document.getElementById('playerHealth');
+const enemyHealthEl = document.getElementById('enemyHealth');
+const playerHpNum = document.getElementById('playerHpNum');
+const enemyHpNum = document.getElementById('enemyHpNum');
+const messageEl = document.getElementById('message');
+const statusText = document.getElementById('statusText');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const comboDisplay = document.getElementById('comboDisplay');
+const roundNum = document.getElementById('roundNum');
+const timerNum = document.getElementById('timerNum');
 
-      const dist = enemy.x - player.x;
-      if (dist >= 0) {
-        playerEl.style.transform = 'scaleX(1)';
-        enemyEl.style.transform = 'scaleX(-1)';
+// Build special pips
+function buildPips(containerId, count=5){
+  const c = document.getElementById(containerId);
+  c.innerHTML='';
+  for(let i=0;i<count;i++){
+    const d = document.createElement('div');
+    d.className='specialPip';
+    c.appendChild(d);
+  }
+}
+buildPips('playerSpecialPips');
+buildPips('enemySpecialPips');
+
+function updatePips(id, filled){
+  const pips = document.getElementById(id).querySelectorAll('.specialPip');
+  pips.forEach((p,i)=> p.classList.toggle('full', i < filled));
+}
+
+// ── STATE ──
+const ARENA_H = ()=> arena.clientHeight;
+const ARENA_W = ()=> arena.clientWidth;
+const FLOOR_Y = ()=> ARENA_H() * 0.21;
+const FIGHTER_W = 70;
+const FIGHTER_H = 120;
+
+let gameStarted = false;
+let gameOver = false;
+let round = 1;
+let timer = 60;
+let timerInterval = null;
+let comboCount = 0;
+let comboTimeout = null;
+
+const player = {
+  x:110, y:0, health:100, maxHealth:100,
+  speed:7, jumping:false, velY:0,
+  attacking:false, attackType:null, hurtCooldown:0,
+  special:0, maxSpecial:5, facing:1,
+  comboTimer:0
+};
+const enemy = {
+  x:800, y:0, health:100, maxHealth:100,
+  speed:2.8, jumping:false, velY:0,
+  attacking:false, attackType:null, hurtCooldown:0,
+  special:3, maxSpecial:5, facing:-1,
+  nextDecision:0, aggression:0.6
+};
+
+const keys = {};
+
+// ── HELPERS ──
+let msgTimeout = null;
+function setMessage(text, keep=false, type=''){
+  messageEl.textContent = text;
+  messageEl.className = 'message show ' + type;
+  clearTimeout(msgTimeout);
+  if(!keep) msgTimeout = setTimeout(()=>messageEl.classList.remove('show'),1100);
+}
+
+function setStatus(t){ statusText.textContent = t }
+
+function spawnHitEffect(x, y, text, color='#ffe600'){
+  const d = document.createElement('div');
+  d.className = 'hitEffect';
+  d.textContent = text;
+  d.style.cssText = `left:${x}px;top:${y}px;color:${color};text-shadow:0 0 10px ${color}`;
+  arena.appendChild(d);
+  setTimeout(()=>d.remove(), 550);
+}
+
+function spawnSparks(x, y, color){
+  for(let i=0;i<7;i++){
+    const s = document.createElement('div');
+    s.className='spark';
+    const angle = (Math.random()*Math.PI*2);
+    const dist = 25 + Math.random()*45;
+    s.style.cssText = `left:${x}px;top:${y}px;background:${color};
+      --sx:${Math.cos(angle)*dist}px;--sy:${Math.sin(angle)*dist-20}px;
+      animation-delay:${Math.random()*0.06}s`;
+    arena.appendChild(s);
+    setTimeout(()=>s.remove(),500);
+  }
+}
+
+function flashScreen(color='rgba(255,255,255,1)'){
+  const d = document.createElement('div');
+  d.className='screenFlash';
+  d.style.background=color;
+  arena.appendChild(d);
+  setTimeout(()=>d.remove(),200);
+}
+
+function animFighter(el, cls){
+  el.classList.remove('punch','kick','special','hurt','jump');
+  void el.offsetWidth;
+  el.classList.add(cls);
+  setTimeout(()=>el.classList.remove(cls), 400);
+}
+
+// ── RENDER ──
+function render(){
+  // positions
+  playerEl.style.left = player.x + 'px';
+  enemyEl.style.left = enemy.x + 'px';
+
+  // facing
+  const dist = enemy.x - player.x;
+  const px = dist >= 0 ? 1 : -1;
+  const ex = -px;
+  playerEl.style.setProperty('--fx', px);
+  enemyEl.style.setProperty('--fx', ex);
+  if(!playerEl.classList.contains('punch') && !playerEl.classList.contains('kick') &&
+     !playerEl.classList.contains('special') && !playerEl.classList.contains('hurt') &&
+     !playerEl.classList.contains('ko')){
+    playerEl.style.transform = `scaleX(${px})`;
+  }
+  if(!enemyEl.classList.contains('punch') && !enemyEl.classList.contains('kick') &&
+     !enemyEl.classList.contains('special') && !enemyEl.classList.contains('hurt') &&
+     !enemyEl.classList.contains('ko')){
+    enemyEl.style.transform = `scaleX(${ex})`;
+  }
+
+  // y position (jump)
+  playerEl.style.bottom = `calc(21% + ${player.y}px)`;
+  enemyEl.style.bottom = `calc(21% + ${enemy.y}px)`;
+
+  // health bars
+  const ph = Math.max(0,player.health);
+  const eh = Math.max(0,enemy.health);
+  playerHealthEl.style.width = (ph/player.maxHealth*100) + '%';
+  enemyHealthEl.style.width = (eh/enemy.maxHealth*100) + '%';
+  playerHpNum.textContent = Math.ceil(ph) + ' HP';
+  enemyHpNum.textContent = Math.ceil(eh) + ' HP';
+
+  // color warning
+  if(ph < 25) playerHealthEl.style.background='linear-gradient(90deg,#ff1744,#ff6d00)';
+  else playerHealthEl.style.background='';
+
+  // special pips
+  updatePips('playerSpecialPips', Math.floor(player.special));
+  updatePips('enemySpecialPips', Math.floor(enemy.special));
+}
+
+// ── PHYSICS ──
+const GRAVITY = 4;
+const JUMP_FORCE = 14;
+function updatePhysics(obj){
+  if(obj.y > 0 || obj.jumping){
+    obj.velY -= GRAVITY * 0.08;
+    obj.y += obj.velY;
+    if(obj.y <= 0){ obj.y=0; obj.velY=0; obj.jumping=false; }
+  }
+}
+
+// ── ATTACK ──
+function canHit(atk, def){
+  const reach = 75;
+  return Math.abs((atk.x + FIGHTER_W/2) - (def.x + FIGHTER_W/2)) < reach;
+}
+
+function doAttack(atkObj, atkEl, defObj, defEl, damage, type){
+  if(!gameStarted || gameOver || atkObj.attacking) return;
+  if(type==='special' && atkObj.special < atkObj.maxSpecial) return;
+
+  atkObj.attacking = true;
+  if(type==='special'){ atkObj.special=0; sfxSpecial(); animFighter(atkEl,'special') }
+  else if(type==='kick'){ sfxKick(); animFighter(atkEl,'kick') }
+  else { sfxPunch(); animFighter(atkEl,'punch') }
+
+  setTimeout(()=>{
+    if(!gameStarted && !gameOver) return;
+    if(canHit(atkObj, defObj)){
+      const dmg = type==='special' ? damage*2.5 : damage;
+      defObj.health = Math.max(0, defObj.health - dmg);
+
+      // special regen for attacker on hit
+      if(type!=='special') atkObj.special = Math.min(atkObj.maxSpecial, atkObj.special+1);
+
+      sfxHurt();
+      animFighter(defEl,'hurt');
+      flashScreen(type==='special' ? 'rgba(192,38,211,.4)' : 'rgba(255,255,255,.25)');
+
+      const hx = defObj.x + FIGHTER_W/2;
+      const hy = ARENA_H()*0.25;
+
+      if(atkObj === player){
+        comboCount++;
+        clearTimeout(comboTimeout);
+        comboTimeout = setTimeout(()=>{ comboCount=0; comboDisplay.classList.remove('show') },1000);
+        const labels = ['HIT!','DOUBLE!','TRIPLE!','COMBO x4!','RAMPAGE!'];
+        const col = type==='special' ? '#c026d3' : '#ffe600';
+        const txt = type==='special' ? '⚡ ULTRA HIT!' : (labels[Math.min(comboCount-1,4)] || 'HIT!');
+        spawnHitEffect(hx-30, hy, txt, col);
+        spawnSparks(hx, ARENA_H()*.3, col);
+        if(comboCount>=2){
+          comboDisplay.textContent = comboCount + ' HIT COMBO!';
+          comboDisplay.classList.add('show');
+        }
+        setMessage(type==='special' ? '⚡ ULTRA ATTACK!' : (comboCount>=3 ? comboCount+'x COMBO!' : (type==='kick'?'STRONG HIT!':'QUICK HIT!')));
+        setStatus(type==='special' ? '🔥 Ataque especial!' : (type==='kick'?'Chute pesado!':'Soco rápido!'));
       } else {
-        playerEl.style.transform = 'scaleX(-1)';
-        enemyEl.style.transform = 'scaleX(1)';
+        spawnHitEffect(hx-30, hy, type==='special'?'💀 ULTRA!':'BOSS HIT!', '#ff4444');
+        spawnSparks(hx, ARENA_H()*.3, '#ff4444');
+        setMessage(type==='special'?'😱 ULTRA DO BOSS!':'👊 BOSS TE ACERTOU!');
       }
+      checkWin();
     }
+  }, 80);
 
-    function rectsOverlap(aLeft, aRight, bLeft, bRight){
-      return aRight >= bLeft && aLeft <= bRight;
-    }
+  setTimeout(()=>{ atkObj.attacking=false }, type==='special' ? 400 : 230);
+}
 
-    function canHit(attacker, defender){
-      const aLeft = attacker.x;
-      const aRight = attacker.x + attacker.width + 55;
-      const dLeft = defender.x;
-      const dRight = defender.x + defender.width;
-      return rectsOverlap(aLeft, aRight, dLeft, dRight);
-    }
+function doJump(obj, el){
+  if(obj.jumping || gameOver || !gameStarted) return;
+  obj.jumping=true; obj.velY=JUMP_FORCE;
+  animFighter(el,'jump');
+}
 
-    function attack(attackerObj, attackerEl, defenderObj, defenderEl, damage, type){
-      if (!gameStarted || gameOver || attackerObj.attacking) return;
+// ── WIN CHECK ──
+function checkWin(){
+  render();
+  if(enemy.health<=0){
+    gameOver=true; gameStarted=false;
+    clearInterval(timerInterval);
+    setTimeout(()=>{
+      sfxWin();
+      setMessage('🏆 VOCÊ VENCEU!', true, 'win');
+      setStatus('Vitória! 🎉 Agora você pode voltar aos projetos.');
+      enemyEl.classList.add('ko');
+    },100);
+  } else if(player.health<=0){
+    gameOver=true; gameStarted=false;
+    clearInterval(timerInterval);
+    setTimeout(()=>{
+      sfxKO();
+      setMessage('💀 GAME OVER', true, 'lose');
+      setStatus('Derrota... Aperte RESTART para revanche!');
+      playerEl.classList.add('ko');
+    },100);
+  }
+}
 
-      attackerObj.attacking = true;
-      attackerEl.classList.add(type === 'kick' ? 'kicking' : 'punching');
-      attackerEl.classList.add('showHitbox');
-
-      setTimeout(() => {
-        if (canHit(attackerObj, defenderObj)) {
-          defenderObj.health = Math.max(0, defenderObj.health - damage);
-          defenderEl.classList.add('hurt');
-          statusText.textContent = type === 'kick' ? 'Acerto forte!' : 'Acerto rápido!';
-          setTimeout(() => defenderEl.classList.remove('hurt'), 180);
-
-          if (defenderObj === enemy) {
-            setMessage(type === 'kick' ? 'CRITICAL HIT!' : 'HIT!');
-          } else {
-            setMessage('O BOSS TE ACERTOU!');
-          }
-          checkWin();
-        }
-      }, 90);
-
-      setTimeout(() => {
-        attackerObj.attacking = false;
-        attackerEl.classList.remove('punching', 'kicking', 'showHitbox');
-      }, 220);
-    }
-
-    function jump(obj){
-      if (obj.jumping || gameOver) return;
-      obj.jumping = true;
-      setTimeout(() => obj.jumping = false, 520);
-    }
-
-    function checkWin(){
-      render();
-      if (enemy.health <= 0) {
-        gameOver = true;
-        gameStarted = false;
-        setMessage('VOCÊ VENCEU!', true);
-        statusText.textContent = 'Vitória! Agora você pode mandar a pessoa voltar para os projetos.';
-      } else if (player.health <= 0) {
-        gameOver = true;
-        gameStarted = false;
-        setMessage('GAME OVER', true);
-        statusText.textContent = 'Derrota. Aperte restart para jogar de novo.';
+// ── TIMER ──
+function startTimer(){
+  clearInterval(timerInterval);
+  timer=60;
+  timerNum.textContent=timer;
+  timerInterval = setInterval(()=>{
+    if(!gameStarted || gameOver){ clearInterval(timerInterval); return; }
+    timer--;
+    timerNum.textContent=timer;
+    if(timer<=0){
+      clearInterval(timerInterval);
+      // time over — winner by HP
+      if(player.health > enemy.health){
+        enemy.health=0;
+      } else {
+        player.health=0;
       }
+      checkWin();
     }
+  },1000);
+}
 
-    function restartGame(){
-      gameStarted = false;
-      gameOver = false;
-      player.x = 120;
-      player.health = 100;
-      player.jumping = false;
-      player.attacking = false;
-      enemy.x = Math.max(420, arenaWidth() - 260);
-      enemy.health = 100;
-      enemy.jumping = false;
-      enemy.attacking = false;
-      statusText.textContent = 'Dica: chegue perto do inimigo antes de atacar.';
-      setMessage('APERTE START', true);
-      render();
+// ── RESTART / START ──
+function restartGame(){
+  gameStarted=false; gameOver=false;
+  clearInterval(timerInterval);
+  comboCount=0; comboDisplay.classList.remove('show');
+  player.x=110; player.y=0; player.health=100; player.jumping=false; player.attacking=false; player.velY=0; player.special=0;
+  enemy.x=Math.max(440, ARENA_W()-200); enemy.y=0; enemy.health=100; enemy.jumping=false; enemy.attacking=false; enemy.velY=0; enemy.special=3;
+  enemy.nextDecision=0;
+  playerEl.classList.remove('ko','punch','kick','special','hurt','jump');
+  enemyEl.classList.remove('ko','punch','kick','special','hurt','jump');
+  playerEl.style.bottom='21%'; enemyEl.style.bottom='21%';
+  setStatus('Dica: chegue perto do inimigo antes de atacar!');
+  setMessage('APERTE START', true);
+  render();
+}
+
+function startGame(){
+  if(gameOver) restartGame();
+  gameStarted=true;
+  messageEl.classList.remove('show');
+  setStatus('LUTA! 💥');
+  startTimer();
+}
+
+// ── PLAYER MOVEMENT ──
+function movePlayer(){
+  if(!gameStarted || gameOver) return;
+  if(keys['a']||keys['arrowleft']) player.x -= player.speed;
+  if(keys['d']||keys['arrowright']) player.x += player.speed;
+  player.x = Math.max(10, Math.min(ARENA_W()-FIGHTER_W-10, player.x));
+  updatePhysics(player);
+}
+
+// ── ENEMY AI ──
+function enemyAI(ts){
+  if(!gameStarted || gameOver) return;
+  if(ts < enemy.nextDecision) return;
+  updatePhysics(enemy);
+
+  const dist = enemy.x - player.x;
+  const abs = Math.abs(dist);
+
+  // advance
+  if(abs > 90){
+    enemy.x += dist>0 ? -enemy.speed*1.6 : enemy.speed*1.6;
+  } else if(!enemy.attacking){
+    const r = Math.random();
+    if(enemy.special >= enemy.maxSpecial && r < 0.25){
+      doAttack(enemy, enemyEl, player, playerEl, 12, 'special');
+    } else if(r < 0.5){
+      doAttack(enemy, enemyEl, player, playerEl, 7, 'punch');
+    } else {
+      doAttack(enemy, enemyEl, player, playerEl, 12, 'kick');
     }
+  }
 
-    function startGame(){
-      if (gameOver) restartGame();
-      gameStarted = true;
-      messageEl.classList.remove('show');
-      statusText.textContent = 'Luta iniciada.';
-    }
+  if(Math.random() > 0.85) doJump(enemy, enemyEl);
 
-    function movePlayer(){
-      if (!gameStarted || gameOver) return;
-      if (keys['a']) player.x -= player.speed;
-      if (keys['d']) player.x += player.speed;
+  // regen special
+  enemy.special = Math.min(enemy.maxSpecial, enemy.special + 0.3);
 
-      player.x = Math.max(20, Math.min(arenaWidth() - player.width - 20, player.x));
-    }
+  enemy.x = Math.max(10, Math.min(ARENA_W()-FIGHTER_W-10, enemy.x));
+  const reaction = 280 + Math.random()*300;
+  enemy.nextDecision = ts + reaction;
+}
 
-    function enemyAI(ts){
-      if (!gameStarted || gameOver) return;
-      if (ts < enemy.nextDecision) return;
+// ── GAME LOOP ──
+function gameLoop(ts){
+  movePlayer();
+  enemyAI(ts);
+  render();
+  requestAnimationFrame(gameLoop);
+}
 
-      const distance = enemy.x - player.x;
-      const absDist = Math.abs(distance);
+// ── KEYBOARD ──
+window.addEventListener('keydown', e=>{
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if(k==='w'||k==='arrowup') doJump(player, playerEl);
+  if(k==='j') doAttack(player, playerEl, enemy, enemyEl, 10, 'punch');
+  if(k==='k') doAttack(player, playerEl, enemy, enemyEl, 16, 'kick');
+  if(k==='l') doAttack(player, playerEl, enemy, enemyEl, 20, 'special');
+  if(k==='enter'||k===' ') { e.preventDefault(); if(!gameStarted) startGame() }
+});
+window.addEventListener('keyup', e=>{ keys[e.key.toLowerCase()]=false });
 
-      if (absDist > 120) {
-        enemy.x += distance > 0 ? -enemy.speed * 8 : enemy.speed * 8;
-        statusText.textContent = 'O boss está se aproximando.';
-      } else if (!enemy.attacking) {
-        if (Math.random() > 0.45) {
-          attack(enemy, enemyEl, player, playerEl, 8, 'punch');
-        } else {
-          attack(enemy, enemyEl, player, playerEl, 14, 'kick');
-        }
-      }
+// ── BUTTONS ──
+startBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', restartGame);
 
-      if (Math.random() > 0.82) jump(enemy);
+// ── MOBILE PAD ──
+function holdKey(key, el){
+  el.addEventListener('touchstart', e=>{ e.preventDefault(); keys[key]=true; el.classList.add('active') }, {passive:false});
+  el.addEventListener('touchend', e=>{ e.preventDefault(); keys[key]=false; el.classList.remove('active') }, {passive:false});
+  el.addEventListener('mousedown', ()=>{ keys[key]=true });
+  el.addEventListener('mouseup', ()=>{ keys[key]=false });
+}
+holdKey('a', document.getElementById('padLeft'));
+holdKey('d', document.getElementById('padRight'));
 
-      enemy.x = Math.max(20, Math.min(arenaWidth() - enemy.width - 20, enemy.x));
-      enemy.nextDecision = ts + 300 + Math.random() * 320;
-    }
+document.getElementById('padJump').addEventListener('click', ()=> doJump(player, playerEl));
+document.getElementById('padPunch').addEventListener('click', ()=> doAttack(player, playerEl, enemy, enemyEl, 10, 'punch'));
+document.getElementById('padKick').addEventListener('click', ()=> doAttack(player, playerEl, enemy, enemyEl, 16, 'kick'));
+document.getElementById('padSpecial').addEventListener('click', ()=> doAttack(player, playerEl, enemy, enemyEl, 20, 'special'));
 
-    function gameLoop(ts){
-      movePlayer();
-      enemyAI(ts);
-      render();
-      requestAnimationFrame(gameLoop);
-    }
+// ── RESIZE ──
+window.addEventListener('resize', ()=>{
+  enemy.x = Math.min(enemy.x, ARENA_W()-FIGHTER_W-10);
+  player.x = Math.min(player.x, ARENA_W()-FIGHTER_W-10);
+  render();
+});
 
-    window.addEventListener('keydown', (e) => {
-      const key = e.key.toLowerCase();
-      keys[key] = true;
-
-      if (key === 'w') jump(player);
-      if (key === 'j') attack(player, playerEl, enemy, enemyEl, 10, 'punch');
-      if (key === 'k') attack(player, playerEl, enemy, enemyEl, 18, 'kick');
-    });
-
-    window.addEventListener('keyup', (e) => {
-      keys[e.key.toLowerCase()] = false;
-    });
-
-    startBtn.addEventListener('click', startGame);
-    restartBtn.addEventListener('click', restartGame);
-
-    window.addEventListener('resize', () => {
-      enemy.x = Math.min(enemy.x, arenaWidth() - enemy.width - 20);
-      player.x = Math.min(player.x, arenaWidth() - player.width - 20);
-      render();
-    });
-
-    restartGame();
-    requestAnimationFrame(gameLoop);
-  </script>
+// ── INIT ──
+restartGame();
+requestAnimationFrame(gameLoop);
+</script>
 </body>
 </html>
